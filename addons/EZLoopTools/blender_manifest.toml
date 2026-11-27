@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+id = "ez_loop_tools"
+version = "1.1.0"
+name = "EZLoopTools"
+tagline = "Apply LoopTools to edge paths within selected faces"
+maintainer = "Snowyegret"
+type = "add-on"
+website = "https://github.com/snowyegret23/blender_tool"
+tags = ["Mesh"]
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-only"]
+
+[build]
+paths_exclude_pattern = ["/.github/", "/.gitattributes", "__pycache__/", "*.pyc", "/*.zip"]

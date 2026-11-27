@@ -1,10 +1,10 @@
 bl_info = {
-    "name": "EZLooptools",
+    "name": "EZLoopTools",
     "author": "Snowyegret",
-    "version": (1, 0, 1),
-    "blender": (3, 6, 0),
+    "version": (1, 1, 0),
+    "blender": (5, 2, 0),
     "location": "View3D > Sidebar > EZLooptools",
-    "description": "Apply LoopTools Flatten, Relax, or Space to faces",
+    "description": "Apply LoopTools to edge paths within selected faces",
     "category": "Mesh",
 }
 
@@ -18,10 +18,11 @@ def register():
     bpy.utils.register_class(EZLOOPTOOLS_PT_Panel)
 
     bpy.types.Scene.ezlooptools_direction = EnumProperty(
-        name="Direction",
-        description="Choose whether to operate on Horizontal or Vertical loops",
+        name="Edge Paths",
+        description="Choose the paths to process within the selected faces",
         items=[
-            ('HORIZONTAL', "Horizontal", "Operate on horizontal loops"),
+            ('HORIZONTAL', "All Loops", "Process edge paths through the selected faces"),
+            ('BOUNDARY', "Selection Boundary", "Process only the outer edges of the selected faces"),
         ],
         default='HORIZONTAL'
     )

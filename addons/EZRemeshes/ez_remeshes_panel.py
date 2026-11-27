@@ -9,8 +9,8 @@ class EZRemeshesPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("mesh.ez_remeshes_operator_far", text="Run EZRemeshes Far")
-        layout.operator("mesh.ez_remeshes_operator_close", text="Run EZRemeshes Close")
+        layout.operator("mesh.ez_remeshes_operator_far", text="Split N-gons (Far)")
+        layout.operator("mesh.ez_remeshes_operator_close", text="Split N-gons (Close)")
 
 def register():
     bpy.utils.register_class(EZRemeshesPanel)

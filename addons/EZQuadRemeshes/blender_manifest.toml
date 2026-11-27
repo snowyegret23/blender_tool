@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+id = "ez_quad_remeshes"
+version = "1.1.0"
+name = "EZQuadRemeshes"
+tagline = "Remesh the active mesh with QuadriFlow"
+maintainer = "Snowyegret"
+type = "add-on"
+website = "https://github.com/snowyegret23/blender_tool"
+tags = ["Mesh"]
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-only"]
+
+[build]
+paths_exclude_pattern = ["/.github/", "/.gitattributes", "__pycache__/", "*.pyc", "/*.zip"]

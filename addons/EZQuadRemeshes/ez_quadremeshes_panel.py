@@ -1,10 +1,10 @@
 import bpy
-from bpy.props import IntProperty, PointerProperty
+from bpy.props import BoolProperty, IntProperty, PointerProperty
 
 class EZQuadRemeshesProperties(bpy.types.PropertyGroup):
     target_faces: IntProperty(
         name="Target Faces",
-        description="Number of faces after remeshing",
+        description="Approximate target face count",
         default=4000,
         min=100,
         max=100000
@@ -17,6 +17,10 @@ class EZQuadRemeshesProperties(bpy.types.PropertyGroup):
         min=0,
         max=20
     )
+
+    preserve_boundary: BoolProperty(name="Preserve Boundary", default=True)
+    preserve_sharp: BoolProperty(name="Preserve Sharp", default=True)
+
 
 class EZQUADREMESHES_PT_main_panel(bpy.types.Panel):
     bl_label = "EZ Quad Remeshes"
@@ -33,12 +37,11 @@ class EZQUADREMESHES_PT_main_panel(bpy.types.Panel):
         layout.prop(ez_props, "target_faces")
         layout.prop(ez_props, "smooth_iterations")
         
-        op = layout.operator("ezquadremeshes.remesh")
-        if context.active_object and context.active_object.mode == 'EDIT':
-            op.selected_only = True
-            layout.label(text="Will remesh selected faces only")
-        else:
-            op.selected_only = False
+        layout.prop(ez_props, "preserve_boundary")
+        layout.prop(ez_props, "preserve_sharp")
+        if context.mode != 'OBJECT':
+            layout.label(text="Switch to Object Mode", icon='INFO')
+        layout.operator("ezquadremeshes.remesh")
 
 def register():
     bpy.utils.register_class(EZQuadRemeshesProperties)

@@ -1,14 +1,13 @@
 bl_info = {
     "name": "EZLoop",
     "author": "Snowyegret",
-    "version": (1, 0, 0),
-    "blender": (3, 6, 0),
+    "version": (1, 1, 0),
+    "blender": (5, 2, 0),
     "location": "View3D > N-Panel > EZLoop",
-    "description": "Quick access to LoopTools Flatten, Relax, and Space",
+    "description": "Run LoopTools Flatten, Relax and Space from the sidebar",
     "category": "Mesh",
 }
 
-import bpy
 from . import ezloop_operation
 from . import ezloop_panel
 
@@ -17,8 +16,8 @@ def register():
     ezloop_panel.register()
 
 def unregister():
-    ezloop_operation.unregister()
     ezloop_panel.unregister()
+    ezloop_operation.unregister()
 
 if __name__ == "__main__":
     register()

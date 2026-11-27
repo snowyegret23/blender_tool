@@ -11,7 +11,6 @@ class EZLOOPTOOLS_PT_Panel(Panel):
     def draw(self, context):
         layout = self.layout
 
-        layout.label(text="Apply to Loops:")
         layout.prop(context.scene, 'ezlooptools_direction', expand=True)
         layout.prop(context.scene, 'ezlooptools_operation', expand=True)
         layout.operator('mesh.ezlooptools_operation', text='Apply')
