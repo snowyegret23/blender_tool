@@ -1,6 +1,6 @@
 schema_version = "1.0.0"
 id = "ez_loop"
-version = "1.1.0"
+version = "1.1.1"
 name = "EZLoop"
 tagline = "Run LoopTools Flatten, Relax and Space from the sidebar"
 maintainer = "Snowyegret"

@@ -1,7 +1,7 @@
 bl_info = {
     "name": "EZRemeshes Far and Close",
     "author": "Snowyegret",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (5, 2, 0),
     "location": "View3D > N-Panel > EZRemeshes",
     "description": "Split n-gons with short or long diagonals",

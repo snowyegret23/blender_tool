@@ -1,4 +1,5 @@
 from array import array
+from math import cos, radians
 
 import bpy
 from bpy.types import Operator
@@ -9,18 +10,33 @@ def smooth_mesh(mesh, iterations, preserve_boundary, preserve_sharp):
     count = len(mesh.vertices)
     neighbors = [[] for _ in range(count)]
     face_counts = [0] * len(mesh.edges)
-    if preserve_boundary:
+    creases = set()
+    if preserve_boundary or preserve_sharp:
         indices = array('i', [0]) * len(mesh.loops)
         mesh.loops.foreach_get("edge_index", indices)
-        for index in indices:
-            face_counts[index] += 1
+        if preserve_sharp:
+            first_face = [-1] * len(mesh.edges)
+            normals = [face.normal.copy() for face in mesh.polygons]
+            cutoff = cos(radians(45.0))
+            for face in mesh.polygons:
+                for j in face.loop_indices:
+                    edge = indices[j]
+                    if face_counts[edge] == 0:
+                        first_face[edge] = face.index
+                    elif face_counts[edge] == 1:
+                        if normals[face.index].dot(normals[first_face[edge]]) < cutoff:
+                            creases.add(edge)
+                    face_counts[edge] += 1
+        else:
+            for edge in indices:
+                face_counts[edge] += 1
     fixed = set()
     for edge in mesh.edges:
         a, b = edge.vertices
         neighbors[a].append(b)
         neighbors[b].append(a)
         if ((preserve_boundary and face_counts[edge.index] != 2)
-                or (preserve_sharp and edge.use_edge_sharp)):
+                or (preserve_sharp and (edge.use_edge_sharp or edge.index in creases))):
             fixed.update((a, b))
     movable = [(i, adjacent, 0.5 / len(adjacent))
                for i, adjacent in enumerate(neighbors) if adjacent and i not in fixed]

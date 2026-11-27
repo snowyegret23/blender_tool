@@ -4,7 +4,7 @@ Five independently installable extensions for Blender **5.2 LTS**. Tested with B
 
 | Extension | What it does |
 | --- | --- |
-| [EZDeleteChildBone](addons/EZDeleteChildBone/) | Delete unselected descendant bones without deleting the selected bones. |
+| [EZDeleteChildBone](addons/EZDeleteChildBone/) | Delete visible, selectable descendant bones while keeping selected and protected bones. |
 | [EZLoop](addons/EZLoop/) | Run LoopTools Flatten, Relax, or Space from the sidebar. |
 | [EZLoopTools](addons/EZLoopTools/) | Run LoopTools on edge paths through selected faces, or just their boundary. |
 | [EZQuadRemeshes](addons/EZQuadRemeshes/) | Run QuadriFlow and optionally smooth the output without touching existing modifiers. |

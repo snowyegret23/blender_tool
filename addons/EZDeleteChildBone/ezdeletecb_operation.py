@@ -4,7 +4,7 @@ import bpy
 class EZDELETECB_OT_delete_child_bones(bpy.types.Operator):
     bl_idname = "ezdeletecb.delete_child_bones"
     bl_label = "Delete Child Bones"
-    bl_description = "Delete unselected descendants of the selected bones in the active armature"
+    bl_description = "Delete visible, selectable descendants while keeping selected bones"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -12,10 +12,14 @@ class EZDELETECB_OT_delete_child_bones(bpy.types.Operator):
         return context.mode == 'EDIT_ARMATURE' and context.edit_object is not None
 
     def execute(self, context):
-        bones = context.edit_object.data.edit_bones
+        armature = context.edit_object.data
+        bones = armature.edit_bones
         # Snapshot names before mutation; removing a connected bone can change its
         # children's parent and selection state.
-        roots = {bone.name for bone in bones if bone.select and not bone.hide}
+        eligible = {bone.name for bone in context.visible_bones
+                    if bone.id_data == armature and not bone.hide_select}
+        selected = {bone.name for bone in bones if bone.select}
+        roots = selected & eligible
         children = {}
         for bone in bones:
             if bone.parent:
@@ -29,15 +33,17 @@ class EZDELETECB_OT_delete_child_bones(bpy.types.Operator):
                 if name not in seen:
                     seen.add(name)
                     queue.append(name)
-                    descendants.append(name)
+                    if name in eligible and name not in selected:
+                        descendants.append(name)
 
         if not descendants:
-            self.report({'INFO'}, "No unselected descendant bones to delete")
+            self.report({'INFO'}, "No visible, selectable descendant bones to delete")
             return {'CANCELLED'}
 
         moving = set(descendants)
-        for name in roots:
-            bone = bones[name]
+        for bone in bones:
+            if bone.name in moving:
+                continue
             parent = bone.parent
             if parent and parent.name in moving:
                 while parent and parent.name in moving:

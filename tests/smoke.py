@@ -58,6 +58,43 @@ def bones_test():
     assert bpy.ops.ezdeletecb.delete_child_bones() == {'CANCELLED'}
 
 
+def bone_protection_test():
+    fresh()
+    arm = bpy.data.armatures.new("Protected rig")
+    activate(bpy.data.objects.new("Protected rig", arm))
+    bpy.ops.object.mode_set(mode='EDIT')
+    bones = arm.edit_bones
+    hidden_collection = arm.collections.new("Hidden")
+    hidden_collection.is_visible = False
+    inherited_hidden = arm.collections.new("Nested", parent=hidden_collection)
+    visible_collection = arm.collections.new("Visible")
+    tree = (("Root", None), ("Visible child", "Root"), ("Hidden bone", "Visible child"),
+            ("Unselectable", "Visible child"), ("Hidden collection", "Root"),
+            ("Visible and hidden collections", "Root"), ("Beyond hidden bone", "Hidden bone"))
+    for i, (name, parent) in enumerate(tree):
+        bone = bones.new(name)
+        bone.head, bone.tail = (0, i, 0), (0, i + 1, 0)
+        if parent:
+            bone.parent = bones[parent]
+            bone.use_connect = True
+    bones["Hidden bone"].hide = True
+    bones["Unselectable"].hide_select = True
+    inherited_hidden.assign(bones["Hidden collection"])
+    hidden_collection.assign(bones["Visible and hidden collections"])
+    visible_collection.assign(bones["Visible and hidden collections"])
+    bpy.ops.armature.select_all(action='DESELECT')
+    bones["Root"].select = True
+    bones.active = bones["Root"]
+    heads = {name: bones[name].head.copy() for name in ("Hidden bone", "Unselectable")}
+    assert bpy.ops.ezdeletecb.delete_child_bones() == {'FINISHED'}
+    assert set(bones.keys()) == {"Root", "Hidden bone", "Unselectable", "Hidden collection"}
+    for name, head in heads.items():
+        assert bones[name].parent == bones["Root"]
+        assert bones[name].head == head
+    assert bones["Hidden bone"].hide and bones["Unselectable"].hide_select
+    assert bpy.ops.ezdeletecb.delete_child_bones() == {'CANCELLED'}
+
+
 def ngon_test():
     ngon = [(math.cos(i * math.tau / 8), math.sin(i * math.tau / 8), 0) for i in range(8)]
     concave = [(0, 0, 0), (4, 0, 0), (4, 4, 0), (3, 4, 0),
@@ -119,6 +156,24 @@ def quad_test():
     obj = mesh_object(points, [(0, 1, 2), (1, 0, 3), (0, 1, 4)])
     assert bpy.ops.ezquadremeshes.remesh() == {'CANCELLED'}
     assert [tuple(v.co) for v in obj.data.vertices] == points
+
+
+def crease_test():
+    import importlib
+
+    pkg = next((key for key in bpy.context.preferences.addons.keys()
+                if key.startswith("bl_ext.") and key.endswith(".ez_quad_remeshes")),
+               "EZQuadRemeshes")
+    smooth_mesh = importlib.import_module(pkg + ".ez_quadremeshes_operation").smooth_mesh
+    original = [(0, 0, 0), (2, 0, 0), (2, 2, 0), (0, 2, 0), (0, 0, 2), (2, 0, 2)]
+    for protect in (True, False):
+        fresh()
+        obj = mesh_object(original, [(0, 1, 2, 3), (1, 0, 4, 5)])
+        assert not any(e.use_edge_sharp for e in obj.data.edges)
+        assert abs(obj.data.polygons[0].normal.dot(obj.data.polygons[1].normal)) < 1e-6
+        smooth_mesh(obj.data, 2, preserve_boundary=False, preserve_sharp=protect)
+        assert all((tuple(obj.data.vertices[i].co) == original[i]) == protect for i in (0, 1))
+        assert tuple(obj.data.vertices[2].co) != original[2]  # Smoothing really ran.
 
 
 def edit_grid(mirror=False):
@@ -203,7 +258,7 @@ def main():
         modules = [importlib.import_module(name) for name in SOURCE_NAMES]
         for module in modules:
             module.register()
-    for test in (bones_test, ngon_test, quad_test, loop_test):
+    for test in (bones_test, bone_protection_test, ngon_test, quad_test, crease_test, loop_test):
         test()
         print(f"PASS {test.__name__}")
     fresh()

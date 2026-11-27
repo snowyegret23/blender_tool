@@ -1,7 +1,7 @@
 bl_info = {
     "name": "EZDeleteChildBone",
     "author": "Snowyegret",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (5, 2, 0),
     "location": "View3D > Sidebar > EZDeleteChildBone",
     "description": "Delete unselected descendants of selected bones",
